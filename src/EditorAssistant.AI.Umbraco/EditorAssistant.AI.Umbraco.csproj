@@ -1,0 +1,75 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+	<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>EditorAssistant.AI.Umbraco</PackageId>
+	<Product>Umbraco.EditorAssistant.AI</Product>
+    <Version>1.0.0</Version>
+    <Authors>Alaeddin Alhamoud</Authors>
+	<Copyright>Copyright © 2026 Alaeddin Alhamoud</Copyright>
+    <Description>AI-powered page summarization and provider configuration for Umbraco websites.</Description>
+	<PackageReleaseNotes>Initial release..</PackageReleaseNotes>
+    <PackageTags>umbraco;ai;assistant;openai;azure-openai;gemini;claude;deepseek;ollama;summarization</PackageTags>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+	<PackageProjectUrl>https://github.com/Alaeddinalhamoud/Umbraco.EditorAssistant.AI</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/Alaeddinalhamoud/Umbraco.EditorAssistant.AI</RepositoryUrl>
+    <Product>EditorAssistant.AI.Umbraco</Product>
+    <Title>EditorAssistant.AI.Umbraco</Title>
+    <PackageIcon>package-icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+	<IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+
+  <!-- Central package management - no versions -->
+  <ItemGroup>
+    <PackageReference Include="Umbraco.Cms.Api.Common" />
+    <PackageReference Include="Umbraco.Cms.Api.Management" />
+    <PackageReference Include="Umbraco.Cms.Core" />
+    <PackageReference Include="Umbraco.Cms.Web.Common" />
+    <PackageReference Include="Umbraco.Cms.Web.Website" />
+
+    <!--
+      Microsoft.AspNetCore.OpenApi is available transitively from the Umbraco packages above, but we
+      take a direct dependency here because extension code directly uses types from this package
+      (IOpenApiDocumentTransformer, IOpenApiOperationTransformer, etc.) and from Microsoft.OpenApi
+      (OpenApiInfo). Without a direct reference, this project's Microsoft.AspNetCore.OpenApi version
+      is determined solely by NuGet's transitive resolution, which can resolve to a different version
+      than the host site project (e.g. a newer patch). When that happens, the different
+      Microsoft.OpenApi versions can conflict at runtime, causing custom OpenAPI documents registered
+      by the extension to fail to appear.
+      Most other transitive dependencies don't have this problem because extension code doesn't use
+      their types directly - only Microsoft.AspNetCore.OpenApi / Microsoft.OpenApi types are
+      referenced in the composer.
+    -->
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.Extensions.AI" />
+    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" />
+    <PackageReference Include="Microsoft.Extensions.AI.Ollama" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <!-- Don't include the client folder as part of packaging nuget build -->
+    <Content Remove="Client\**" />
+
+    <!-- However make the Umbraco-package.json included for dotnet pack or nuget package and visible to the solution -->
+    <None Include="Client\public\umbraco-package.json" Pack="false" />
+    <None Include="package-icon.png" Pack="true" PackagePath="\" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <Content Update="wwwroot\App_Plugins\**" Pack="true" PackagePath="wwwroot\App_Plugins\" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+</Project>

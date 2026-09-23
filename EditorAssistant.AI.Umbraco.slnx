@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/EditorAssistant.AI.Umbraco/EditorAssistant.AI.Umbraco.csproj" />
+  <Project Path="tests/EditorAssistant.AI.Umbraco.Tests/EditorAssistant.AI.Umbraco.Tests.csproj" />
+</Solution>

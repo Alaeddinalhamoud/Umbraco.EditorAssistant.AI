@@ -1,0 +1,15 @@
+{
+  "id": "EditorAssistant.AI.Umbraco",
+  "name": "EditorAssistant.AI.Umbraco",
+  "version": "0.0.0",
+  "icon": "icon-sparkles",
+  "allowTelemetry": true,
+  "extensions": [
+    {
+      "name": "Editor Assistant AIUmbraco Bundle",
+      "alias": "EditorAssistant.AI.Umbraco.Bundle",
+      "type": "bundle",
+      "js": "/App_Plugins/EditorAssistantAIUmbraco/editor-assistant-ai-umbraco.js"
+    }
+  ]
+}
