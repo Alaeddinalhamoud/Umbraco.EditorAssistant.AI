@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "test": "vitest run",
     "watch": "tsc && vite build --watch",
     "build": "tsc && vite build",
     "generate-client": "node scripts/generate-openapi.js https://localhost:5000/umbraco/openapi/editorassistantaiumbraco.json"
@@ -13,9 +14,11 @@
     "@umbraco-cms/backoffice": "^17.6.2",
     "chalk": "^5.6.2",
     "cross-env": "^10.1.0",
+    "jsdom": "^27.0.0",
     "lit": "^3.3.0",
     "node-fetch": "^3.3.2",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vitest": "^4.1.11"
   }
 }

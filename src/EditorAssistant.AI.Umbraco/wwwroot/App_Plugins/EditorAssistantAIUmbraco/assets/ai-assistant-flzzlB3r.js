@@ -1,128 +1,4 @@
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { client } from '../api/client.gen.js';
-import { jsonBodySerializer } from '../api/core/bodySerializer.gen.js';
-import { customElement, state } from 'lit/decorators.js';
-
-type Provider = 'Microsoft' | 'OpenAI' | 'Claude' | 'Gemini' | 'DeepSeek' | 'Ollama';
-type Settings = { provider: Provider; model: string; endpoint?: string; enabled: boolean };
-
-const defaultModels: Record<Provider, string> = {
-  Microsoft: 'gpt-4o-mini',
-  OpenAI: 'gpt-4o-mini',
-  Claude: 'claude-3-5-sonnet-latest',
-  Gemini: 'gemini-3.5-flash',
-  DeepSeek: 'deepseek-chat',
-  Ollama: 'llama3.2',
-};
-
-const modelDocumentation: Record<Provider, string> = {
-  Microsoft: 'https://learn.microsoft.com/azure/ai-services/openai/concepts/models',
-  OpenAI: 'https://platform.openai.com/docs/models',
-  Claude: 'https://docs.anthropic.com/en/docs/about-claude/models',
-  Gemini: 'https://ai.google.dev/gemini-api/docs/models',
-  DeepSeek: 'https://api-docs.deepseek.com/quick_start/models',
-  Ollama: 'https://ollama.com/library',
-};
-
-@customElement('editor-assistant-settings')
-export class AIAssistantSettings extends UmbLitElement {
-  @state() private _provider: Provider = 'Microsoft';
-  @state() private _model = defaultModels.Microsoft;
-  @state() private _endpoint = '';
-  @state() private _apiKey = '';
-  @state() private _message = '';
-  @state() private _error = '';
-  @state() private _saving = false;
-  @state() private _testing = false;
-  @state() private _summariesEnabled = true;
-
-  connectedCallback() {
-    super.connectedCallback();
-    void this._configureAndLoad();
-  }
-
-  private async _configureAndLoad() {
-    const authContext = await this.getContext(UMB_AUTH_CONTEXT);
-    authContext?.configureClient(client);
-    await this._load();
-  }
-
-  private async _load() {
-    const result = await client.get<Settings>({
-      url: '/umbraco/editorassistantaiumbraco/api/v1/Settings',
-      security: [{ scheme: 'bearer', type: 'http' }],
-    });
-    if (!result.response?.ok || !result.data) return;
-    const settings = result.data as unknown as Settings;
-    this._provider = settings.provider;
-    this._model = settings.model;
-    this._endpoint = settings.endpoint ?? '';
-    this._summariesEnabled = settings.enabled;
-  }
-
-  private async _save(event: SubmitEvent) {
-    event.preventDefault();
-    this._saving = true;
-    this._message = '';
-    this._error = '';
-    const testResponse = await this._request('/TestConnection');
-    if (!testResponse.ok) {
-      this._error = await this._readError(testResponse, 'The API key or model could not be verified.');
-      this._saving = false;
-      return;
-    }
-    const response = await this._request('/Settings');
-    if (response.ok) this._message = this._summariesEnabled ? 'Connection verified and settings saved. Page summaries are enabled.' : 'Connection verified and settings saved. Page summaries are disabled.';
-    else this._error = await this._readError(response, 'Settings could not be saved.');
-    this._saving = false;
-  }
-
-  private async _testConnection() {
-    this._testing = true;
-    this._message = '';
-    this._error = '';
-    const response = await this._request('/TestConnection');
-    if (response.ok) this._message = 'Connection verified successfully.';
-    else this._error = await this._readError(response, 'The API key or model could not be verified.');
-    this._testing = false;
-  }
-
-  private _request(path: string) {
-    return client.post({
-      url: `/umbraco/editorassistantaiumbraco/api/v1${path}`,
-      security: [{ scheme: 'bearer', type: 'http' }],
-      bodySerializer: jsonBodySerializer.bodySerializer,
-      headers: { 'Content-Type': 'application/json' },
-      body: {
-        provider: this._provider,
-        model: this._model,
-        endpoint: this._provider === 'Microsoft' || this._provider === 'Ollama' ? this._endpoint : undefined,
-        apiKey: this._apiKey || undefined,
-        enabled: this._summariesEnabled,
-      },
-    }).then(result => result.response!);
-  }
-
-  private async _readError(response: Response, fallback: string) {
-    const body = await response.text().catch(() => '');
-    if (body) {
-      try {
-        const problem = JSON.parse(body) as { detail?: string; title?: string; error?: string };
-        if (problem.detail || problem.error || problem.title) {
-          return problem.detail ?? problem.error ?? problem.title!;
-        }
-      } catch {
-        return `${fallback}: ${body} (HTTP ${response.status})`;
-      }
-    }
-
-    return `${fallback} (HTTP ${response.status})`;
-  }
-
-  render() {
-    return html`
+import{UmbLitElement as g}from"@umbraco-cms/backoffice/lit-element";import{UMB_AUTH_CONTEXT as m}from"@umbraco-cms/backoffice/auth";import{html as l,css as h}from"@umbraco-cms/backoffice/external/lit";import{c as p,j as f}from"./client.gen-2SvRqEG3.js";import{r as s,t as v}from"./state-G4_ANB4m.js";var x=Object.defineProperty,b=Object.getOwnPropertyDescriptor,o=(e,i,r,a)=>{for(var n=a>1?void 0:a?b(i,r):i,c=e.length-1,d;c>=0;c--)(d=e[c])&&(n=(a?d(i,r,n):d(n))||n);return a&&n&&x(i,r,n),n};const u={Microsoft:"gpt-4o-mini",OpenAI:"gpt-4o-mini",Claude:"claude-3-5-sonnet-latest",Gemini:"gemini-3.5-flash",DeepSeek:"deepseek-chat",Ollama:"llama3.2"},y={Microsoft:"https://learn.microsoft.com/azure/ai-services/openai/concepts/models",OpenAI:"https://platform.openai.com/docs/models",Claude:"https://docs.anthropic.com/en/docs/about-claude/models",Gemini:"https://ai.google.dev/gemini-api/docs/models",DeepSeek:"https://api-docs.deepseek.com/quick_start/models",Ollama:"https://ollama.com/library"};let t=class extends g{constructor(){super(...arguments),this._provider="Microsoft",this._model=u.Microsoft,this._endpoint="",this._apiKey="",this._message="",this._error="",this._saving=!1,this._testing=!1,this._summariesEnabled=!0}connectedCallback(){super.connectedCallback(),this._configureAndLoad()}async _configureAndLoad(){(await this.getContext(m))?.configureClient(p),await this._load()}async _load(){const e=await p.get({url:"/umbraco/editorassistantaiumbraco/api/v1/Settings",security:[{scheme:"bearer",type:"http"}]});if(!e.response?.ok||!e.data)return;const i=e.data;this._provider=i.provider,this._model=i.model,this._endpoint=i.endpoint??"",this._summariesEnabled=i.enabled}async _save(e){e.preventDefault(),this._saving=!0,this._message="",this._error="";const i=await this._request("/TestConnection");if(!i.ok){this._error=await this._readError(i,"The API key or model could not be verified."),this._saving=!1;return}const r=await this._request("/Settings");r.ok?this._message=this._summariesEnabled?"Connection verified and settings saved. Page summaries are enabled.":"Connection verified and settings saved. Page summaries are disabled.":this._error=await this._readError(r,"Settings could not be saved."),this._saving=!1}async _testConnection(){this._testing=!0,this._message="",this._error="";const e=await this._request("/TestConnection");e.ok?this._message="Connection verified successfully.":this._error=await this._readError(e,"The API key or model could not be verified."),this._testing=!1}_request(e){return p.post({url:`/umbraco/editorassistantaiumbraco/api/v1${e}`,security:[{scheme:"bearer",type:"http"}],bodySerializer:f.bodySerializer,headers:{"Content-Type":"application/json"},body:{provider:this._provider,model:this._model,endpoint:this._provider==="Microsoft"||this._provider==="Ollama"?this._endpoint:void 0,apiKey:this._apiKey||void 0,enabled:this._summariesEnabled}}).then(i=>i.response)}async _readError(e,i){const r=await e.text().catch(()=>"");if(r)try{const a=JSON.parse(r);if(a.detail||a.error||a.title)return a.detail??a.error??a.title}catch{return`${i}: ${r} (HTTP ${e.status})`}return`${i} (HTTP ${e.status})`}render(){return l`
       <div class="page">
         <header><div class="hero-icon"><umb-icon name="icon-editor-assistant-ai"></umb-icon></div><div class="hero-copy">
           <div class="eyebrow">EDITOR ASSISTANT</div>
@@ -136,10 +12,7 @@ export class AIAssistantSettings extends UmbLitElement {
           <form @submit=${this._save}>
             <uui-form-layout-item>
               <div slot="label" class="field-label"><uui-icon name="icon-cloud"></uui-icon><uui-label for="ai-provider">Provider</uui-label></div>
-              <select id="ai-provider" aria-label="AI provider" .value=${this._provider} @change=${(e: Event) => {
-                this._provider = (e.target as HTMLSelectElement).value as Provider;
-                this._model = defaultModels[this._provider];
-              }}>
+              <select id="ai-provider" aria-label="AI provider" .value=${this._provider} @change=${e=>{this._provider=e.target.value,this._model=u[this._provider]}}>
                 <option value="Microsoft">Microsoft Azure OpenAI</option>
                 <option value="OpenAI">OpenAI</option>
                 <option value="Claude">Anthropic Claude</option>
@@ -151,41 +24,41 @@ export class AIAssistantSettings extends UmbLitElement {
             <uui-form-layout-item>
               <div slot="label" class="label-row">
                 <span class="field-label"><uui-icon name="icon-brick"></uui-icon><uui-label>Model / deployment</uui-label></span>
-                <a href=${modelDocumentation[this._provider]} target="_blank" rel="noopener noreferrer">
+                <a href=${y[this._provider]} target="_blank" rel="noopener noreferrer">
                   <uui-icon name="icon-link"></uui-icon> View available models
                 </a>
               </div>
-              <uui-input aria-label="Model or deployment" required .value=${this._model} placeholder=${defaultModels[this._provider]}
-                @input=${(e: Event) => this._model = (e.target as HTMLInputElement).value}></uui-input>
+              <uui-input aria-label="Model or deployment" required .value=${this._model} placeholder=${u[this._provider]}
+                @input=${e=>this._model=e.target.value}></uui-input>
               <small>Enter the exact model or deployment name from your provider.</small>
             </uui-form-layout-item>
-            ${this._provider === 'Microsoft' || this._provider === 'Ollama' ? html`
+            ${this._provider==="Microsoft"||this._provider==="Ollama"?l`
               <uui-form-layout-item>
-                <div slot="label" class="field-label"><uui-icon name="icon-globe"></uui-icon><uui-label>${this._provider === 'Ollama' ? 'Ollama endpoint' : 'Azure OpenAI endpoint'}</uui-label></div>
-                <uui-input aria-label="Provider endpoint" required .value=${this._endpoint} placeholder=${this._provider === 'Ollama' ? 'http://localhost:11434' : 'https://your-resource.openai.azure.com'}
-                  @input=${(e: Event) => this._endpoint = (e.target as HTMLInputElement).value}></uui-input>
+                <div slot="label" class="field-label"><uui-icon name="icon-globe"></uui-icon><uui-label>${this._provider==="Ollama"?"Ollama endpoint":"Azure OpenAI endpoint"}</uui-label></div>
+                <uui-input aria-label="Provider endpoint" required .value=${this._endpoint} placeholder=${this._provider==="Ollama"?"http://localhost:11434":"https://your-resource.openai.azure.com"}
+                  @input=${e=>this._endpoint=e.target.value}></uui-input>
               </uui-form-layout-item>
-            ` : ''}
-            ${this._provider !== 'Ollama' ? html`<uui-form-layout-item>
+            `:""}
+            ${this._provider!=="Ollama"?l`<uui-form-layout-item>
               <div slot="label" class="field-label"><uui-icon name="icon-lock"></uui-icon><uui-label>API key</uui-label></div>
               <uui-input aria-label="API key" type="password" placeholder="Leave blank to keep the saved key" .value=${this._apiKey}
-                @input=${(e: Event) => this._apiKey = (e.target as HTMLInputElement).value}></uui-input>
+                @input=${e=>this._apiKey=e.target.value}></uui-input>
               <small>Your key is encrypted and never returned to the browser.</small>
-            </uui-form-layout-item>` : html`
+            </uui-form-layout-item>`:l`
               <div class="ollama-note">
                 <uui-icon name="icon-check"></uui-icon>
                 Ollama runs locally and does not require an API key.
               </div>
             `}
             <div class="actions">
-              <uui-button type="button" look="secondary" .disabled=${this._testing || this._saving}
-                @click=${this._testConnection}><uui-icon name="icon-wifi"></uui-icon>${this._testing ? 'Testing...' : 'Test connection'}</uui-button>
-              <uui-button type="submit" look="primary" color="positive" .disabled=${this._saving || this._testing}>
-                <uui-icon name="icon-check"></uui-icon>${this._saving ? 'Saving...' : 'Verify & save'}
+              <uui-button type="button" look="secondary" .disabled=${this._testing||this._saving}
+                @click=${this._testConnection}><uui-icon name="icon-wifi"></uui-icon>${this._testing?"Testing...":"Test connection"}</uui-button>
+              <uui-button type="submit" look="primary" color="positive" .disabled=${this._saving||this._testing}>
+                <uui-icon name="icon-check"></uui-icon>${this._saving?"Saving...":"Verify & save"}
               </uui-button>
             </div>
-            ${this._message ? html`<p class="success" role="status">${this._message}</p>` : ''}
-            ${this._error ? html`<p class="error" role="alert">${this._error}</p>` : ''}
+            ${this._message?l`<p class="success" role="status">${this._message}</p>`:""}
+            ${this._error?l`<p class="error" role="alert">${this._error}</p>`:""}
           </form>
         </div>
         </main><aside class="guide" aria-label="Setup guide"><div class="section-heading"><span class="step-number">2</span><div><h2 class="configuration-heading">Make it yours</h2><p class="section-subtitle">Choose where your assistant can help.</p></div></div>
@@ -210,8 +83,7 @@ export class AIAssistantSettings extends UmbLitElement {
                 <small>Let website visitors summarize pages. Save provider settings to apply.</small>
               </div>
               <label class="switch">
-                <input type="checkbox" role="switch" aria-label="Enable page summaries" .checked=${this._summariesEnabled} @change=${(e: Event) =>
-                  this._summariesEnabled = (e.target as HTMLInputElement).checked} />
+                <input type="checkbox" role="switch" aria-label="Enable page summaries" .checked=${this._summariesEnabled} @change=${e=>this._summariesEnabled=e.target.checked} />
                 <span class="slider"></span>
               </label>
             </div>
@@ -228,23 +100,20 @@ export class AIAssistantSettings extends UmbLitElement {
         <details class="script-help">
           <summary>Frontend script for page summaries</summary>
           <p>Add this once to each public layout where you want the summarize button to appear:</p>
-          <pre><code>${'<script type="module" src="@Url.Content("~/App_Plugins/EditorAssistantAIUmbraco/editor-assistant-frontend.js")"></script>'}</code></pre>
+          <pre><code>${'<script type="module" src="@Url.Content("~/App_Plugins/EditorAssistantAIUmbraco/editor-assistant-frontend.js")"><\/script>'}</code></pre>
         </details>
         </aside></div><div class="plan-note" role="note">
           <uui-icon name="icon-info"></uui-icon>
           <p><strong>What is sent to AI?</strong> Page summaries send the current page text when a visitor requests a summary. The Rich Text Editor assistant sends the editor's prompt, selected text, and any field context they choose to include. Editors review generated content before inserting it.</p>
         </div>
         <footer class="package-footer">
-          <a href=${__EDITOR_ASSISTANT_REPOSITORY_URL__} target="_blank" rel="noopener noreferrer">
+          <a href=${"https://github.com/Alaeddinalhamoud/Umbraco.EditorAssistant.AI"} target="_blank" rel="noopener noreferrer">
             <umb-icon name="icon-link"></umb-icon> GitHub repository
           </a>
-          <span>Editor Assistant AI &middot; Version ${__EDITOR_ASSISTANT_VERSION__}</span>
+          <span>Editor Assistant AI &middot; Version ${"1.2.0"}</span>
         </footer>
       </div>
-    `;
-  }
-
-  static styles = css`
+    `}};t.styles=h`
     :host { --assistant-accent: var(--uui-color-interactive, #3544b1); --assistant-tint: color-mix(in srgb, var(--assistant-accent) 7%, var(--uui-color-surface, white)); }
     * { box-sizing: border-box; }
     :host { display: block; min-height: 100%; padding: 32px; background: var(--uui-color-surface-alt, #f7f8fa); color: var(--uui-color-text, #1f2937); }
@@ -376,7 +245,5 @@ export class AIAssistantSettings extends UmbLitElement {
       .feature-card { padding: 18px; }
     }
     @media (prefers-reduced-motion: reduce) { .slider, .slider::before { transition: none; } }
-  `;
-}
-
-export default AIAssistantSettings;
+  `;o([s()],t.prototype,"_provider",2);o([s()],t.prototype,"_model",2);o([s()],t.prototype,"_endpoint",2);o([s()],t.prototype,"_apiKey",2);o([s()],t.prototype,"_message",2);o([s()],t.prototype,"_error",2);o([s()],t.prototype,"_saving",2);o([s()],t.prototype,"_testing",2);o([s()],t.prototype,"_summariesEnabled",2);t=o([v("editor-assistant-settings")],t);const $=t;export{t as AIAssistantSettings,$ as default};
+//# sourceMappingURL=ai-assistant-flzzlB3r.js.map
