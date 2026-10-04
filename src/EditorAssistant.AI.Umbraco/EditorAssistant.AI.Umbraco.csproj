@@ -22,6 +22,7 @@
 - Control public page summaries independently with the Enable page summaries switch; rich text generation remains available when summaries are disabled.
 - Verify the shared provider connection before saving settings and protect stored credentials with ASP.NET Core Data Protection.
 - Support Azure OpenAI, OpenAI, Claude, Gemini, DeepSeek, and Ollama; cache identical page summaries for one day while editor generation and connection tests bypass the cache.
+- Replace the deprecated Microsoft.Extensions.AI.Ollama dependency with OllamaSharp.
 - Update installation, configuration, privacy, and development documentation.</PackageReleaseNotes>
     <PackageTags>umbraco;ai;assistant;openai;azure-openai;gemini;claude;deepseek;ollama;summarization</PackageTags>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -38,30 +39,15 @@
 
   <!-- Central package management - no versions -->
   <ItemGroup>
-    <PackageReference Include="OllamaSharp" />
     <PackageReference Include="Umbraco.Cms.Api.Common" />
     <PackageReference Include="Umbraco.Cms.Api.Management" />
     <PackageReference Include="Umbraco.Cms.Core" />
     <PackageReference Include="Umbraco.Cms.Web.Common" />
     <PackageReference Include="Umbraco.Cms.Web.Website" />
-
-    <!--
-      Microsoft.AspNetCore.OpenApi is available transitively from the Umbraco packages above, but we
-      take a direct dependency here because extension code directly uses types from this package
-      (IOpenApiDocumentTransformer, IOpenApiOperationTransformer, etc.) and from Microsoft.OpenApi
-      (OpenApiInfo). Without a direct reference, this project's Microsoft.AspNetCore.OpenApi version
-      is determined solely by NuGet's transitive resolution, which can resolve to a different version
-      than the host site project (e.g. a newer patch). When that happens, the different
-      Microsoft.OpenApi versions can conflict at runtime, causing custom OpenAPI documents registered
-      by the extension to fail to appear.
-      Most other transitive dependencies don't have this problem because extension code doesn't use
-      their types directly - only Microsoft.AspNetCore.OpenApi / Microsoft.OpenApi types are
-      referenced in the composer.
-    -->
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Microsoft.Extensions.AI" />
     <PackageReference Include="Microsoft.Extensions.AI.OpenAI" />
-    <PackageReference Include="Microsoft.Extensions.AI.Ollama" />
+    <PackageReference Include="OllamaSharp" />
   </ItemGroup>
 
 

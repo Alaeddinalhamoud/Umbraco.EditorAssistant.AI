@@ -3,6 +3,7 @@ using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Caching.Memory;
 using OpenAI;
 using OpenAI.Chat;
+using OllamaSharp;
 using Serilog;
 using System.Security.Cryptography;
 using System.Text;
@@ -73,7 +74,7 @@ public sealed class ChatClientFactory(
                 var ollamaEndpoint = new Uri(string.IsNullOrWhiteSpace(settings.Endpoint)
                     ? "http://localhost:11434"
                     : settings.Endpoint);
-                var ollamaClient = new OllamaChatClient(ollamaEndpoint, settings.Model);
+                using Microsoft.Extensions.AI.IChatClient ollamaClient = new OllamaApiClient(ollamaEndpoint, settings.Model);
                 var ollamaResult = await ollamaClient.GetResponseAsync(prompt, cancellationToken: cancellationToken);
                 return new Models.ChatResponse(ollamaResult.Text);
             }

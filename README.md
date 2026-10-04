@@ -17,7 +17,7 @@ Editor Assistant AI helps editors write and improve content in the Umbraco Rich 
 
 ## Requirements
 
-- Umbraco CMS 17.6.2 (the version referenced by this project).
+- Umbraco CMS 17.7.0 (the version referenced by this project).
 - .NET 10 SDK and runtime.
 - For frontend development and tests: Node.js 20.19+ in the 20.x line, 22.12+ in the 22.x line, or 24+. These ranges satisfy the current Vite and Vitest requirements.
 - Either a cloud AI provider account with an API key and model/deployment, or a local Ollama installation with a downloaded model.
@@ -149,6 +149,8 @@ Create a Gemini API key in Google AI Studio, ensure the selected model is availa
 
 #### Ollama
 
+The Ollama provider uses [OllamaSharp](https://github.com/awaescher/OllamaSharp) through the Microsoft.Extensions.AI chat interface.
+
 Install Ollama on the same machine that runs Umbraco, start the service, and download a model:
 
 ```bash
@@ -194,7 +196,7 @@ The default implementation calls `POST /umbraco/editorassistantaiumbraco/api/v1/
 
 This endpoint requires authenticated backoffice access to the Content section. Requests time out after 90 seconds; cancelling the dialog cancels the browser request. Generate and insertion actions are disabled while a request is running.
 
-The toolbar uses `tiptapToolbarExtension` with `kind: 'button'` and `UmbTiptapToolbarElementApiBase.execute(editor)`, plus an Umbraco modal token and modal manifest. It uses the existing editor schema and does not require a separate TipTap node or mark extension. The client depends on `@umbraco-cms/backoffice` **^17.6.2**. See the [Umbraco 17 toolbar API](https://apidocs.umbraco.com/v17/ui-api/classes/packages_tiptap.UmbTiptapToolbarElementApiBase.html).
+The toolbar uses `tiptapToolbarExtension` with `kind: 'button'` and `UmbTiptapToolbarElementApiBase.execute(editor)`, plus an Umbraco modal token and modal manifest. It uses the existing editor schema and does not require a separate TipTap node or mark extension. The client depends on `@umbraco-cms/backoffice` **^17.7.0**. See the [Umbraco 17 toolbar API](https://apidocs.umbraco.com/v17/ui-api/classes/packages_tiptap.UmbTiptapToolbarElementApiBase.html).
 
 Run the rich text command tests from the client directory with `npm test`, and build the packaged assets with `npm run build`.
 
