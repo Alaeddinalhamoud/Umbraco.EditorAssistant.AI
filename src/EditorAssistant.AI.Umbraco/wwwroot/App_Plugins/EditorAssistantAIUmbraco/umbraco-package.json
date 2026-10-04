@@ -1,7 +1,7 @@
 {
   "id": "EditorAssistant.AI.Umbraco",
   "name": "EditorAssistant.AI.Umbraco",
-  "version": "0.0.0",
+  "version": "1.0.1",
   "icon": "icon-sparkles",
   "allowTelemetry": true,
   "extensions": [

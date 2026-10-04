@@ -10,7 +10,7 @@ Editor Assistant AI adds an AI-powered page summarizer to an Umbraco website. Ed
 - Tests the provider connection before saving enabled settings.
 - Caches identical chat responses for five minutes to reduce repeated provider requests.
 - Stores provider settings using ASP.NET Core Data Protection encryption.
-- Injects the frontend assistant automatically; no layout changes or script tag are required.
+- Loads the frontend assistant through a script tag you add to your website layout.
 - Shows the assistant only on public frontend pages, never inside `/umbraco`.
 - Renders summaries in a friendly floating dialog with readable point-by-point cards.
 
@@ -43,7 +43,20 @@ dotnet restore
 dotnet run
 ```
 
-The package registers its Umbraco API and frontend startup integration automatically.
+The package registers its Umbraco API automatically. Add the frontend JavaScript to your website layout manually as described below.
+
+### Add the frontend script to your layout
+
+Open the shared Razor layout used by your public pages, for example `Views/Master.cshtml` or `Views/Shared/_Layout.cshtml`. Add this script tag immediately before the closing `</body>` tag:
+
+```cshtml
+    <script type="module" src="@Url.Content("~/App_Plugins/EditorAssistantAIUmbraco/editor-assistant-frontend.js")"></script>
+</body>
+```
+
+Keep `type="module"` because the script imports other JavaScript modules. The package supplies the JavaScript files; you do not need to copy them into your project. `Url.Content` resolves the URL relative to your application's root.
+
+Include the script once in each layout where you want the assistant to appear. Pages that use a different layout need the same script tag in that layout. Then configure and enable the assistant in the backoffice using the steps below.
 
 On public frontend pages, visitors can use the floating **Summarize page** button:
 
@@ -63,7 +76,7 @@ The setup page looks like this:
 
 ![AI Assistant backoffice setup page](docs/images/backoffice-setup.png)
 
-The assistant button is not displayed inside `/umbraco`. It is injected only into public frontend pages after the feature is enabled and the provider has been configured successfully.
+The assistant button is not displayed inside `/umbraco`. It appears on public frontend pages that include the script after the feature is enabled and the provider has been configured successfully.
 
 Identical page-summary requests are cached in memory for five minutes. The cache is local to the Umbraco application instance and connection tests always call the provider directly.
 
@@ -192,7 +205,7 @@ docs/
 ## Troubleshooting
 
 - **AI Assistant is not visible:** grant the user group access to the section and reload the backoffice.
-- **The button is not visible:** confirm the assistant is enabled and the provider connection has been verified. For cloud providers, an API key must be configured.
+- **The button is not visible:** confirm the page's layout includes the frontend script tag above and that the script loads successfully in the browser. Confirm the assistant is enabled and the provider connection has been verified. For cloud providers, an API key must be configured.
 - **Model unavailable:** check the provider's current model list and enter the exact model or deployment name.
 - **Ollama cannot connect:** confirm `ollama serve` is running, the endpoint is reachable from the Umbraco server, and the model has been pulled.
 - **Stale frontend assets:** rebuild the client and hard-refresh the browser.
