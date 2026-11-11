@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <UmbracoVersion Condition="'$(UmbracoVersion)' == ''">17.7.0</UmbracoVersion>
+    <EditorAssistantVersion Condition="'$(EditorAssistantVersion)' == ''">1.2.1</EditorAssistantVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Consume the packed DLL and static assets, never a project reference. -->
+    <PackageReference Include="Umbraco.Cms" Version="$(UmbracoVersion)" />
+    <PackageReference Include="EditorAssistant.AI.Umbraco" Version="$(EditorAssistantVersion)" />
+  </ItemGroup>
+</Project>

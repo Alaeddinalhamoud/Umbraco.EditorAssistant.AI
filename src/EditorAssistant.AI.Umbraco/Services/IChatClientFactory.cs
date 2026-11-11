@@ -4,9 +4,5 @@ namespace EditorAssistant.AI.Umbraco.Services;
 
 public interface IChatClientFactory
 {
-    Task<ChatResponse> GetResponseAsync(
-        AISettings settings,
-        string prompt,
-        CancellationToken cancellationToken,
-        bool bypassCache = false);
+    Task<ChatResponse> GetResponseAsync(AISettings settings, string prompt, CancellationToken cancellationToken, bool bypassCache = false);
 }

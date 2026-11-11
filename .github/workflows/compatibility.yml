@@ -1,0 +1,23 @@
+name: Umbraco compatibility
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: src/EditorAssistant.AI.Umbraco/Client/package-lock.json
+      - name: Test client APIs and installed NuGet package on Umbraco 17 and 18
+        shell: pwsh
+        run: ./tests/Test-Compatibility.ps1

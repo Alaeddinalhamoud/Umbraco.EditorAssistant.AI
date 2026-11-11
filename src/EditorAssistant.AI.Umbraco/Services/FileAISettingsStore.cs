@@ -7,10 +7,7 @@ using System.Text.Json;
 
 namespace EditorAssistant.AI.Umbraco.Services;
 
-public sealed class FileAISettingsStore(
-    IWebHostEnvironment environment,
-    IDataProtectionProvider dataProtectionProvider,
-    ILogger logger) : IAISettingsStore
+public sealed class FileAISettingsStore(IWebHostEnvironment environment, IDataProtectionProvider dataProtectionProvider, ILogger logger) : IAISettingsStore
 {
     private const string FileName = "settings.json";
     private readonly SemaphoreSlim _gate = new(1, 1);

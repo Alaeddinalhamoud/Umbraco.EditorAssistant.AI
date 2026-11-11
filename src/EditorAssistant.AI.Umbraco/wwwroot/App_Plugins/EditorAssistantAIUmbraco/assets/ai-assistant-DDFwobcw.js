@@ -110,7 +110,7 @@ import{UmbLitElement as g}from"@umbraco-cms/backoffice/lit-element";import{UMB_A
           <a href=${"https://github.com/Alaeddinalhamoud/Umbraco.EditorAssistant.AI"} target="_blank" rel="noopener noreferrer">
             <umb-icon name="icon-link"></umb-icon> GitHub repository
           </a>
-          <span>Editor Assistant AI &middot; Version ${"1.2.0"}</span>
+          <span>Editor Assistant AI &middot; Version ${"1.2.1"}</span>
         </footer>
       </div>
     `}};t.styles=h`
@@ -246,4 +246,4 @@ import{UmbLitElement as g}from"@umbraco-cms/backoffice/lit-element";import{UMB_A
     }
     @media (prefers-reduced-motion: reduce) { .slider, .slider::before { transition: none; } }
   `;o([s()],t.prototype,"_provider",2);o([s()],t.prototype,"_model",2);o([s()],t.prototype,"_endpoint",2);o([s()],t.prototype,"_apiKey",2);o([s()],t.prototype,"_message",2);o([s()],t.prototype,"_error",2);o([s()],t.prototype,"_saving",2);o([s()],t.prototype,"_testing",2);o([s()],t.prototype,"_summariesEnabled",2);t=o([v("editor-assistant-settings")],t);const $=t;export{t as AIAssistantSettings,$ as default};
-//# sourceMappingURL=ai-assistant-flzzlB3r.js.map
+//# sourceMappingURL=ai-assistant-DDFwobcw.js.map

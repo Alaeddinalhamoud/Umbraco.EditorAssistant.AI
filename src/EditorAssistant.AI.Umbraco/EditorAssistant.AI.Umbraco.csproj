@@ -10,20 +10,18 @@
   <PropertyGroup>
     <PackageId>EditorAssistant.AI.Umbraco</PackageId>
 	<Product>Umbraco.EditorAssistant.AI</Product>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <Authors>Alaeddin Alhamoud</Authors>
 	<Copyright>Copyright © 2026 Alaeddin Alhamoud</Copyright>
-    <Description>AI writing and page summaries for Umbraco 17. Generate and improve rich text with an editor toolbar assistant, and let website visitors summarize pages using a shared, securely configured AI provider.</Description>
-	<PackageReleaseNotes>AI Assistant for Umbraco 17:
-- Add a Rich Text Editor toolbar assistant to generate drafts, improve selected text, and preview results before inserting or replacing content.
-- Include optional field context, with an accessible info tooltip explaining how it is used.
-- Introduce a responsive prompt dialog with separate instruction and preview panels, themed icons, and clearer action buttons.
-- Refresh the backoffice setup layout with theme-aware colours and feature setup guidance.
-- Control public page summaries independently with the Enable page summaries switch; rich text generation remains available when summaries are disabled.
-- Verify the shared provider connection before saving settings and protect stored credentials with ASP.NET Core Data Protection.
-- Support Azure OpenAI, OpenAI, Claude, Gemini, DeepSeek, and Ollama; cache identical page summaries for one day while editor generation and connection tests bypass the cache.
-- Replace the deprecated Microsoft.Extensions.AI.Ollama dependency with OllamaSharp.
-- Update installation, configuration, privacy, and development documentation.</PackageReleaseNotes>
+    <Description>AI writing and page summaries for Umbraco 17 and 18. Generate and improve rich text with an editor toolbar assistant, and let website visitors summarize pages using a shared, securely configured AI provider.</Description>
+	<PackageReleaseNotes>1.2.1 (11 November 2026)
+- Support Umbraco CMS 17.7+ in the 17.x line and 18.x with one .NET 10 package; limit Umbraco dependencies to versions below 19.
+- Fix startup on Umbraco 18.0 by declaring the Serilog 4.4.0 dependency explicitly, and remove the unused Microsoft.AspNetCore.OpenApi package reference.
+- Use Google.GenAI 2.1.0 for Gemini only, replacing hand-written HTTP requests. Preserve configured credentials and models, summary caching, editor cache bypass, and cancellation; combine all text parts from the first response candidate.
+- Update OllamaSharp to 5.5.2, Microsoft.Extensions.AI and Microsoft.Extensions.AI.OpenAI to 10.11.0, and the client OpenAPI generator to 0.99.0.
+- Add a repeatable compatibility suite and GitHub Actions workflow. Verify the same packed NuGet package on Umbraco 17.7.0, 18.0.0, and 18.3.1, and check client APIs against backoffice 18.0.0 and 18.3.1.
+- Add five Gemini SDK transport tests covering request configuration and multipart text, cache bypass, empty responses, provider errors, and cancellation. All 14 server tests pass; live AI calls and browser dialogs were not exercised.
+- Update compatibility and Gemini documentation and synchronize NuGet, Umbraco manifest, and backoffice display versions to 1.2.1.</PackageReleaseNotes>
     <PackageTags>umbraco;ai;assistant;openai;azure-openai;gemini;claude;deepseek;ollama;summarization</PackageTags>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
@@ -39,15 +37,16 @@
 
   <!-- Central package management - no versions -->
   <ItemGroup>
+    <PackageReference Include="Google.GenAI" />
     <PackageReference Include="Umbraco.Cms.Api.Common" />
     <PackageReference Include="Umbraco.Cms.Api.Management" />
     <PackageReference Include="Umbraco.Cms.Core" />
     <PackageReference Include="Umbraco.Cms.Web.Common" />
     <PackageReference Include="Umbraco.Cms.Web.Website" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Microsoft.Extensions.AI" />
     <PackageReference Include="Microsoft.Extensions.AI.OpenAI" />
     <PackageReference Include="OllamaSharp" />
+    <PackageReference Include="Serilog" />
   </ItemGroup>
 
 

@@ -2,6 +2,18 @@
 
 Editor Assistant AI helps editors write and improve content in the Umbraco Rich Text Editor and gives website visitors concise page summaries through a floating **Summarize page** button. Both features share one AI provider connection, configured from the Umbraco backoffice.
 
+## Release notes
+
+### 1.2.1 (11 November 2026)
+
+- Support Umbraco CMS 17.7+ in the 17.x line and 18.x with one .NET 10 package; limit Umbraco dependencies to versions below 19.
+- Fix startup on Umbraco 18.0 by declaring the Serilog 4.4.0 dependency explicitly, and remove the unused Microsoft.AspNetCore.OpenApi package reference.
+- Use Google.GenAI 2.1.0 for Gemini only, replacing hand-written HTTP requests. Preserve configured credentials and models, summary caching, editor cache bypass, and cancellation; combine all text parts from the first response candidate.
+- Update OllamaSharp to 5.5.2, Microsoft.Extensions.AI and Microsoft.Extensions.AI.OpenAI to 10.11.0, and the client OpenAPI generator to 0.99.0.
+- Add a repeatable compatibility suite and GitHub Actions workflow. Verify the same packed NuGet package on Umbraco 17.7.0, 18.0.0, and 18.3.1, and check client APIs against backoffice 18.0.0 and 18.3.1.
+- Add five Gemini SDK transport tests covering request configuration and multipart text, cache bypass, empty responses, provider errors, and cancellation. All 14 server tests pass; live AI calls and browser dialogs were not exercised.
+- Update compatibility and Gemini documentation and synchronize NuGet, Umbraco manifest, and backoffice display versions to 1.2.1.
+
 ## What it does
 
 - Adds an **AI Assistant** section to the Umbraco backoffice.
@@ -17,9 +29,9 @@ Editor Assistant AI helps editors write and improve content in the Umbraco Rich 
 
 ## Requirements
 
-- Umbraco CMS 17.7.0 (the version referenced by this project).
+- Umbraco CMS 17.7.0 or later in the 17.x line, or Umbraco CMS 18.x. Both use the same NuGet package and require .NET 10.
 - .NET 10 SDK and runtime.
-- For frontend development and tests: Node.js 20.19+ in the 20.x line, 22.12+ in the 22.x line, or 24+. These ranges satisfy the current Vite and Vitest requirements.
+- For frontend development and tests: Node.js 22.18+ in the 22.x line, or 24+. The OpenAPI generator requires at least Node.js 22.18.
 - Either a cloud AI provider account with an API key and model/deployment, or a local Ollama installation with a downloaded model.
 - Cloud providers require an API key and may incur usage charges. Ollama runs locally, does not require an API key, and does not send page content to a cloud provider.
 
@@ -34,7 +46,7 @@ dotnet add package EditorAssistant.AI.Umbraco
 Alternatively, add the package reference to the web project's `.csproj`:
 
 ```xml
-<PackageReference Include="EditorAssistant.AI.Umbraco" Version="1.2.0" />
+<PackageReference Include="EditorAssistant.AI.Umbraco" Version="1.2.1" />
 ```
 
 Restore and start the Umbraco website:
@@ -82,9 +94,9 @@ The **Enable page summaries** switch is in the Page summaries card and controls 
 
 The privacy note below the setup sections explains what content each feature sends to the configured provider.
 
-The version 1.2.0 setup page brings provider settings, feature guidance, and the page summaries switch together:
+The setup page brings provider settings, feature guidance, and the page summaries switch together:
 
-![AI Assistant 1.2.0 backoffice setup page](docs/images/backoffice-setup.png)
+![AI Assistant backoffice setup page](docs/images/backoffice-setup.png)
 
 The assistant button is not displayed inside `/umbraco`. It appears on public frontend pages that include the script after the feature is enabled and the provider has been configured successfully.
 
@@ -145,7 +157,7 @@ Create an Azure OpenAI resource, deploy a model, and copy:
 
 #### Google Gemini
 
-Create a Gemini API key in Google AI Studio, ensure the selected model is available to the key, and enter the key and model in the setup page. The package sends Gemini requests using the native `generateContent` API.
+Create a Gemini API key in Google AI Studio, ensure the selected model is available to the key, and enter the key and model in the setup page. Gemini alone uses the official [Google.GenAI .NET SDK](https://googleapis.github.io/dotnet-genai/) and its native `generateContent` API. The other providers keep their existing clients. Summary caching, editor cache bypass, and request cancellation also apply to Gemini.
 
 #### Ollama
 
@@ -162,7 +174,7 @@ Use `llama3.2` as the model and `http://localhost:11434` as the endpoint. Ollama
 
 ## AI Assistant in the Rich Text Editor
 
-The package includes a toolbar extension for Umbraco 17's `Umb.PropertyEditorUi.Tiptap` editor and `Umbraco.RichText` properties. No Umbraco core changes or frontend layout script are needed for this backoffice feature.
+The package includes a toolbar extension for Umbraco 17 and 18's `Umb.PropertyEditorUi.Tiptap` editor and `Umbraco.RichText` properties. No Umbraco core changes or frontend layout script are needed for this backoffice feature.
 
 The **AI Assistant** toolbar button uses a sparkle icon. Select it to open the instruction and draft preview popup. Its position depends on how you configure the data type's toolbar.
 
@@ -196,7 +208,7 @@ The default implementation calls `POST /umbraco/editorassistantaiumbraco/api/v1/
 
 This endpoint requires authenticated backoffice access to the Content section. Requests time out after 90 seconds; cancelling the dialog cancels the browser request. Generate and insertion actions are disabled while a request is running.
 
-The toolbar uses `tiptapToolbarExtension` with `kind: 'button'` and `UmbTiptapToolbarElementApiBase.execute(editor)`, plus an Umbraco modal token and modal manifest. It uses the existing editor schema and does not require a separate TipTap node or mark extension. The client depends on `@umbraco-cms/backoffice` **^17.7.0**. See the [Umbraco 17 toolbar API](https://apidocs.umbraco.com/v17/ui-api/classes/packages_tiptap.UmbTiptapToolbarElementApiBase.html).
+The toolbar uses `tiptapToolbarExtension` with `kind: 'button'` and `UmbTiptapToolbarElementApiBase.execute(editor)`, plus an Umbraco modal token and modal manifest. It uses the existing editor schema and does not require a separate TipTap node or mark extension. Release assets are built against `@umbraco-cms/backoffice` **^17.6.2** and use host-provided backoffice modules. Compatibility checks also type-check the client against 18.x. See the [Umbraco 17 toolbar API](https://apidocs.umbraco.com/v17/ui-api/classes/packages_tiptap.UmbTiptapToolbarElementApiBase.html).
 
 Run the rich text command tests from the client directory with `npm test`, and build the packaged assets with `npm run build`.
 
@@ -228,6 +240,20 @@ npm test
 ```
 
 The client build writes the packaged assets into `src/EditorAssistant.AI.Umbraco/wwwroot/App_Plugins/EditorAssistantAIUmbraco`.
+
+### Umbraco 17 and 18 compatibility
+
+The NuGet dependency range is `>= 17.7.0` and `< 19.0.0`. The package declares its Serilog dependency explicitly so an Umbraco 18 host also receives the version used to compile the package. It does not depend on either version's OpenAPI document generator; see Umbraco's [18 upgrade notes](https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific) for changes to custom OpenAPI documents.
+
+Run the compatibility suite from the repository root with PowerShell 7:
+
+```powershell
+./tests/Test-Compatibility.ps1
+```
+
+The suite runs server and client unit tests, builds release assets against the locked 17.x backoffice, and checks client types against backoffice 18.0.0 and 18.3.1. It packs one NuGet package and installs that same package into real Umbraco 17.7.0, 18.0.0, and 18.3.1 hosts with separate temporary SQLite databases. The host checks composition, packaged static assets, API routing, anonymous summaries with an unconfigured provider, and authentication on editor endpoints. The GitHub Actions compatibility workflow runs these checks on pushes and pull requests.
+
+These checks do not exercise the browser dialogs or call a live AI provider. Before publishing a release, also verify settings, the TipTap toolbar, inserting/replacing text, and page summaries in a browser on both major versions with your chosen provider. Use the latest patched CMS version for production; the 18.0.0 test checks the compatibility floor.
 
 ## Project structure
 
